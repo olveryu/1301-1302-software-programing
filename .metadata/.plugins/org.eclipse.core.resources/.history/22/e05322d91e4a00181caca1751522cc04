@@ -1,0 +1,434 @@
+import java.util.Random;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+/**Represent the Tetris GameBoard that creates a fully functional MineSweeper game.
+*
+*@author Wenhao Lin
+*@author RuiJie Xu
+*@since 2018-04-25 
+*/
+public class TetrisBoard extends BorderPane{
+	int score;
+	int shape = 0;
+	boolean hasSpace = true;
+	public Timeline timeline = new Timeline();
+	//to store color info
+	int[][] internalColorBoard = {{0,0,0,0,0,0,0,0,0,0},
+								  {0,0,0,0,0,0,0,0,0,0},	
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0},
+			                      {0,0,0,0,0,0,0,0,0,0}};
+	//to store shapes info
+	int[][] internalBoard = {{0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},	
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0},
+							 {0,0,0,0,0,0,0,0,0,0}};
+	//for later tool bar
+	VBox scoreBoard = new VBox();	
+	//main game board
+	GridPane gameBoard = new GridPane();
+	
+	/**
+     * Construct an object instance of the TetrisBoard class.
+     */
+		public TetrisBoard() {
+			gameBoard.setGridLinesVisible(true);
+			//construct the visual gameBoard with stackPane
+			for(int i = 0; i <internalBoard.length; i++) {
+				for(int j= 0 ; j <internalBoard[0].length; j++) {
+					Rectangle s = new Rectangle(45,45);
+					s.setStroke(Color.BLACK);
+					s.setFill(Color.LAVENDER);
+					gameBoard.add(s,j,i);//add square to gameBoard one by one
+				}//for
+			}//for
+		
+		//set the gameboard to the middle of the pane	
+		setCenter(gameBoard);
+		//call to make a newshape object before star
+		newShape();
+		//start refreshing the gameboard
+		timer();
+		//start dropping down the shapes
+		downTimer();
+		
+ 		}//TetrisBoard
+		
+		//handler for update whole board 
+		EventHandler<ActionEvent> handler = event -> {
+			for(int i = 0; i <internalColorBoard.length; i++) {
+				for(int j= 0 ; j <internalColorBoard[0].length; j++) {
+					Rectangle s = new Rectangle(45,45);
+					if(internalColorBoard[i][j] == 0) {
+						s.setStroke(Color.BLACK);
+						s.setFill(Color.LAVENDER);
+					}
+					if(internalColorBoard[i][j]==1){
+						s.setFill(Color.CYAN);
+					}
+					if(internalColorBoard[i][j]==2){
+						s.setFill(Color.BLUE);
+					}
+					if(internalColorBoard[i][j]==3){
+						s.setFill(Color.ORANGE);
+					}
+					if(internalColorBoard[i][j]==4){
+						s.setFill(Color.YELLOW);
+					}
+					if(internalColorBoard[i][j]==5){
+						s.setFill(Color.GREEN);
+					}
+					if(internalColorBoard[i][j]==6){
+						s.setFill(Color.PURPLE);
+					}
+					if(internalColorBoard[i][j]==7){
+						s.setFill(Color.RED);
+					}
+					gameBoard.add(s,j,i);//add square to gameBoard one by one
+				}//for
+			}//for
+		};//handler
+		
+		//handler for dropping down shapes
+		EventHandler<ActionEvent> downHandler = event -> {
+			//new thread for concurrency
+			 Thread t2 = new Thread(() -> {
+			//check if there is space to go down
+			for(int i = 17; i >= 0 ; i--) {
+				for(int j = 0; j < 10; j++) {
+					if(internalBoard[i][j] == 1) {
+						if(i+1>17 || internalBoard[i+1][j]==-1 ) {
+							hasSpace=false;
+						}//if
+					}//if
+				}//for
+			}//for
+	
+			
+			//if no space to move down, set square equal to -1 
+			if(hasSpace==false) {
+				for(int i = 17; i >= 0 ; i--) {
+					for(int j = 0; j < 10; j++) {
+						if(internalBoard[i][j]==1) {
+							internalBoard[i][j]=-1;
+						};
+					}//for
+				}//for
+				newShape();//is shape got stuck, call new shape
+				//if
+			}//if
+			
+			//go down
+			if(hasSpace) {
+				for(int i = 17; i >= 0 ; i--) {
+					for(int j = 0; j < 10; j++) {
+						if(i+1 <=17 && internalBoard[i][j]==1 && internalBoard[i+1][j]==0) {
+							internalBoard[i][j]=0;
+							internalBoard[i+1][j]=1;
+							internalColorBoard[i][j]=0;
+							internalColorBoard[i+1][j]=shape;
+						}//if
+					}//for
+				}//for
+			}//if
+			hasSpace=true;
+			 });//thread
+			 t2.setDaemon(true);
+			 t2.start();
+		};//downHandler
+		
+		//clean row
+//		public void cleanRow() {
+//			boolean clear = false;
+//			int row = 0 ;
+//			for(int i = 17; i >0; i--) {
+//				boolean hasIt = true;
+//				for(int j = 0; j<10; j++) {
+//					if(internalBoard[i][j]!=-1) {
+//						System.out.println("first loop");
+//						hasIt = false;
+//						break;
+//					}//if
+//				}//for
+//				if(hasIt==true) {
+//				System.out.println("true");	
+//				clear=true;
+//				row = i;
+//				System.out.println(row);
+//				break;
+//				}//if
+//			}//for
+//			if (clear==true) {
+//				System.out.println("almost");
+//				for(int i = row; i>0; i --) {
+//					System.out.println("SUCCESS");
+//					
+//					internalBoard[i]=internalBoard[i-1];
+//					internalColorBoard[i]=internalColorBoard[i-1];
+//				}//for
+//				internalBoard[0]= internalBoard[1];
+//				internalColorBoard[0]=internalColorBoard[1];
+//				score=score+10;
+//				cleanRow();
+//			}//if
+//			if(clear==false) {
+//				//update();
+//				return;
+//			}//if
+//			
+//		}//cleanRow
+		
+		
+		/**
+		 *This method creates a random new shape also checks for if there is space to 
+		 *draw the new shape, if not, game Over 
+		 */
+		public void newShape() {	
+			Random r = new Random();
+			int shape = r.nextInt(7) + 1;
+			this.shape = shape;
+			
+			//create the shape that correspond to the random number
+			switch(shape) {
+			case 1:
+					for(int i = 3; i < 7; i++) {
+						if(internalBoard[0][i]==-1) lose();//check for game over
+						internalBoard[0][i]=1;
+						internalColorBoard[0][i]=1;
+					}//for
+					setCenter(gameBoard);
+					break;
+			case 2:
+					for(int i = 3; i < 6; i++) {
+						//check for game over
+						if(internalBoard[0][i]==-1) {
+							lose();
+						}
+						
+						internalBoard[0][i]=1;
+						internalColorBoard[0][i]=2;
+					}//for
+					//check for game over
+					if(internalBoard[1][5]==-1) {
+						lose();
+					}
+					internalBoard[1][5]=1;
+					internalColorBoard[1][5]=2;
+					setCenter(gameBoard);
+					break;
+			case 3:
+					for(int i = 3; i < 6; i++) {
+						//check for game over
+						if(internalBoard[0][i]==-1) {
+							lose();
+						}
+						internalBoard[0][i]=1;
+						internalColorBoard[0][i]=3;
+					}//for
+					//check for game over
+					if(internalBoard[1][3]==-1) {
+						lose();
+					}
+					internalBoard[1][3]=1;
+					internalColorBoard[1][3]=3;
+					setCenter(gameBoard);
+					break;
+			case 4:
+					for(int i =0; i <2; i++) {
+						for(int j=4; j<6; j++) {
+							//check for game over
+							if(internalBoard[i][j]==-1) {
+								lose();
+							}
+							internalBoard[i][j]=1;
+							internalColorBoard[i][j]=4;
+						}//for
+					}//for
+					setCenter(gameBoard);
+					break;
+			case 5:
+					for(int i=4; i<6; i++) {
+						//check for game over
+						if(internalBoard[0][i]==-1) {
+							lose();
+						}
+						internalBoard[0][i]=1;
+						internalColorBoard[0][i]=5;
+					}//for
+					for(int i=3; i<5; i++) {
+						//check for game over
+						if(internalBoard[1][i]==-1) {
+							lose();
+						}
+						internalBoard[1][i]=1;
+						internalColorBoard[1][i]=5;
+					}//for
+					setCenter(gameBoard);
+					break;
+			case 6:
+				for(int i = 3; i < 6; i++) {
+					//check for game over
+					if(internalBoard[0][i]==-1) {
+						lose();
+					}
+					internalBoard[0][i]=1;
+					internalColorBoard[0][i]=6;
+				}//for
+				//check for game over
+				if(internalBoard[1][4]==-1) {
+					lose();
+				}
+				internalBoard[1][4]=1;
+				internalColorBoard[1][4]=6;
+				setCenter(gameBoard);
+				break;
+			case 7:
+				for(int i=3; i<5; i++) {
+					//check for game over
+					if(internalBoard[0][i]==-1) {
+						lose();
+					}
+					internalBoard[0][i]=1;
+					internalColorBoard[0][i]=7;
+				}//for
+				for(int i=4; i<6; i++) {
+					//check for game over
+					if(internalBoard[1][i]==-1) {
+						lose();
+					}
+					internalBoard[1][i]=1;
+					internalColorBoard[1][i]=7;
+				}//for
+				setCenter(gameBoard);
+				break;
+			}//switch
+		}//newShape
+		
+		/**
+	      *This method create a lose mode for the game that stops the timer and create an pop up window
+	      *that displays the some text to inform player that they have lost.
+	      */
+		public void lose() {
+			timeline.pause();
+			Label loseLabel = new Label("GameOver");
+			Stage loseStage = new Stage();
+			loseStage.setMinWidth(100);
+			loseStage.setMinHeight(100);
+			VBox vbox = new VBox();
+			Scene scene = new Scene (vbox);
+			loseStage.setScene(scene);
+			
+			loseStage.initModality(Modality.APPLICATION_MODAL);//block other window before this window is handled
+			loseStage.setTitle("YOU LOST");
+			loseStage.setWidth(250);
+			loseStage.setHeight(300);
+			vbox.getChildren().addAll(loseLabel);
+			vbox.setAlignment(Pos.CENTER);
+			loseStage.sizeToScene();
+		}//lose
+		
+	
+		/**
+		 *This method start a timeline for updating the whole board every half 
+		 *second and the CycleCount is INDEFINITE
+		 */
+		public void timer() {
+			KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.5), handler);
+			timeline.setCycleCount(Timeline.INDEFINITE);
+			timeline.getKeyFrames().add(keyFrame);
+			timeline.play();
+		    }//timer
+		/**
+		 *This method start a timeline for dropping down the shape every half
+		 *second and the CycleCount is INDEFINITE
+		 */
+		public void downTimer() {
+			KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.45), downHandler);
+			timeline.setCycleCount(Timeline.INDEFINITE);
+			timeline.getKeyFrames().add(keyFrame);
+			timeline.play();
+		}
+		
+		/**
+		 *This method Update the board, if some key events are detected,
+		 *this method will be call for immediate game board update to avoid delay
+		 *in the visual aspect of the game
+		 */
+		public void update() {
+			for(int i = 0; i <internalColorBoard.length; i++) {
+				for(int j= 0 ; j <internalColorBoard[0].length; j++) {
+					Rectangle s = new Rectangle(45,45);
+					if(internalColorBoard[i][j] == 0) {
+						s.setStroke(Color.BLACK);
+						s.setFill(Color.LAVENDER);
+					}
+					if(internalColorBoard[i][j]==1){
+						s.setFill(Color.CYAN);
+					}
+					if(internalColorBoard[i][j]==2){
+						s.setFill(Color.BLUE);
+					}
+					if(internalColorBoard[i][j]==3){
+						s.setFill(Color.ORANGE);
+					}
+					if(internalColorBoard[i][j]==4){
+						s.setFill(Color.YELLOW);
+					}
+					if(internalColorBoard[i][j]==5){
+						s.setFill(Color.GREEN);
+					}
+					if(internalColorBoard[i][j]==6){
+						s.setFill(Color.PURPLE);
+					}
+					if(internalColorBoard[i][j]==7){
+						s.setFill(Color.RED);
+					}
+					gameBoard.add(s,j,i);//add square to gameBoard one by one
+				}//for
+			}//for
+		}//update
+	}//BorderPane
+

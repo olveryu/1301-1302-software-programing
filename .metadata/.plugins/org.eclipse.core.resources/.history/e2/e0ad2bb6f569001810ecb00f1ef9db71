@@ -1,0 +1,17 @@
+
+public class forFun {
+	public static void main(String[] args) {
+		double a = 5;
+		double b = 3;
+		double c = a/b;
+		System.out.println(c);
+		double e = (double) c*1000;
+		int d = (int)e;
+		//double d = e/100;
+		double f = d/1000.00;
+		System.out.println(e);
+		System.out.println(d);
+		System.out.println(f);
+		
+	}//main
+}

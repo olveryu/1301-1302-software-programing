@@ -1,0 +1,108 @@
+import java.util.Random;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+/**Represent the Tetris GameBoard that creates a fully functional MineSweeper game.
+*
+*@author Wenhao Lin
+*@author RuiJie Xu
+*@since 2018-04-25 
+*/
+public class TetrisBoard extends BorderPane{
+	int score;
+	int shape = 0;
+	boolean hasSpace = true;
+	public Timeline timeline = new Timeline();
+	int row = 18;
+	int col = 10;
+	
+	//for later tool bar
+	VBox scoreBoard = new VBox();	
+	//main game board
+	GridPane gameBoard = new GridPane();
+	
+	/**
+     * Construct an object instance of the TetrisBoard class.
+     */
+		public TetrisBoard() {
+			gameBoard.setGridLinesVisible(true);
+			//add box to the gameBoard
+			for(int i = 0; i <row; i++) {
+				for(int j= 0 ; j <col; j++) {
+					TetrisBox Box = new TetrisBox();
+					gameBoard.add(Box,j,i);//add square to gameBoard one by one
+				}//for
+			}//for
+		
+			
+		//set the gameboard to the middle of the pane	
+		setCenter(gameBoard);
+		//call to make a newshape object before star
+		//newShape();
+		
+ 		}//TetrisBoard
+	
+	
+	
+	
+	
+	//Box Class represent individual square
+	public class TetrisBox extends Rectangle{
+		public int shapeNum = 0;//shape corresponding number
+		public boolean liveBox = false;//whether the box is movable
+		
+		TetrisBox(){
+			super(45,45);//set dimension
+			
+			setStroke(Color.BLACK);
+		}//Constructor
+		
+		public void paint() {
+			
+			switch(shapeNum) {
+			case 0:
+				setFill(Color.LAVENDER);
+				break;
+			case 1:
+				setFill(Color.CYAN);
+				break;
+			case 2:
+				setFill(Color.BLUE);
+				break;
+			case 3:
+				setFill(Color.ORANGE);
+				break;
+			case 4:
+				setFill(Color.YELLOW);
+				break;
+			case 5:
+				setFill(Color.GREEN);
+				break;
+			case 6:
+				setFill(Color.PURPLE);
+				break;
+			case 7:
+				setFill(Color.RED);
+				break;
+			}//switch
+		}//paint
+		
+	}//TetrisBox
+
+
+}//TetrisBoard

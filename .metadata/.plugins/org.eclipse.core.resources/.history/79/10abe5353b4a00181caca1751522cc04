@@ -1,0 +1,96 @@
+import javafx.animation.KeyFrame;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+public class TetrisApp extends Application {
+
+    @Override
+    public void start(Stage stage) {
+    	//set restart button on action
+    	TetrisBoard newGame = new TetrisBoard();
+    	
+        Scene scene = new Scene(newGame);
+        scene.setOnKeyPressed(e->{
+        	//left arrow pressed
+        	if(e.getCode()==KeyCode.LEFT) {
+        		Boolean hasSpace=true;
+        		//check for space
+        		for(int i = 17; i >= 0 ; i--) {
+        			for(int j = 0; j < 10; j++) {
+        				if(newGame.board[i][j].liveBox == true) {
+        					if(j-1 < 0 || newGame.board[i][j-1].hasBox==true ) {
+        						hasSpace=false;
+    						}//if
+    					}//if
+    				}//for
+    			};//for
+    			//if there is space move left
+    			if(hasSpace) {
+    				for(int i = 17; i >= 0 ; i--) {
+    					for(int j = 0; j < 10; j++) {
+    						if(newGame.board[i][j].liveBox==true) {
+    							newGame.board[i][j].liveBox=false;
+    							newGame.board[i][j].shapeNum=0;
+    							newGame.board[i][j].paint();
+    							newGame.board[i][j-1].liveBox=true;
+    							newGame.board[i][j-1].shapeNum=newGame.shape;
+    							newGame.board[i][j-1].paint();
+    						}
+    					}//for
+    				}//for
+    			}//if
+    			hasSpace=true;
+        	}//if
+        	
+        	//right arrow pressed
+        	if(e.getCode()==KeyCode.RIGHT) {
+        		Boolean hasSpace=true;
+        		//check for space
+        		for(int i = 17; i >= 0 ; i--) {
+        			for(int j = 0; j < 10; j++) {
+        				if(newGame.board[i][j].liveBox == true) {
+        					if(j+1 >9  || newGame.board[i][j+1].hasBox==true ) {
+        						hasSpace=false;
+    						}//if
+    					}//if
+    				}//for
+    			};//for
+    			//if there is space move right
+    			System.out.println(hasSpace);
+    			if(hasSpace) {
+    				for(int i = 0; i <8; i++) {
+    					System.out.println(hasSpace);
+    				}
+    			}//if
+    			hasSpace=true;
+        	}//if        		
+	    });//setOnKeyPressed
+        
+        stage.setTitle("cs1302-arcade!");
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.setHeight(810);
+        stage.setMinHeight(810);
+		stage.setWidth(450);
+		stage.setMinWidth(450);
+        stage.show();
+
+
+    } // start
+
+    public static void main(String[] args) {
+	try {
+	    Application.launch(args);
+	} catch (UnsupportedOperationException e) {
+	    System.out.println(e);
+	    System.err.println("If this is a DISPLAY problem, then your X server connection");
+	    System.err.println("has likely timed out. This can generally be fixed by logging");
+	    System.err.println("out and logging back in.");
+	    System.exit(1);
+	} // try
+    } // main
+
+} // ArcadeApp

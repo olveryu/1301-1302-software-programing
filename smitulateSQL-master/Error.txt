@@ -1,0 +1,30 @@
+Invild or empty command, please check symbol and keyword.
+(INSERT "John Smith" INTO college.students)
+
+Reading failed. college\students.txt (The system cannot find the path specified)
+(SELECT * FROM college.students)
+
+"students.txt" records could not be deleted. table "students.txt " did not exist.
+(DELETE FROM college.students)
+
+"students.txt" reading fail. professors\students.txt (The system cannot find the path specified)
+(SELECT * FROM professors.students WHERE COLUMN = "Jackson Browne")
+
+students.txt""Jackson Browne"" could not be deleted. table "students.txt" did not exist.
+(DELETE FROM professors.students WHERE COLUMN = "Jackson Browne")
+
+Database "colleges" could not be drop. null
+(DROP DATABASE colleges)
+
+Database "professors" could not be created. Database "professors" already exist.
+(CREATE DATABASE professors)
+
+Table "names.txt" could not be created. The system cannot find the path specified
+(CREATE TABLE professors.names)
+
+Table "names.txt" could not be created. Table "names.txt" has already exist.
+(CREATE TABLE professor.names)
+
+"students.txt" reading fail. professor\students.txt (The system cannot find the file specified)
+(SELECT * FROM professor.students WHERE COLUMN = "Jackson Browne")
+

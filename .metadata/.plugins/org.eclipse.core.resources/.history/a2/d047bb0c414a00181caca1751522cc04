@@ -1,0 +1,422 @@
+import java.util.Random;
+
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+/**Represent the Tetris GameBoard that creates a fully functional MineSweeper game.
+*
+*@author Wenhao Lin
+*@author RuiJie Xu
+*@since 2018-04-25 
+*/
+public class TetrisBoard extends BorderPane{
+	int score;
+	int shape = 0;
+	boolean keepGoing = true;
+	boolean hasSpace = true;
+	public Timeline timeline = new Timeline();
+	int row = 18;
+	int col = 10;
+	TetrisBox[][] board;
+	
+	//for later tool bar
+	VBox scoreBoard = new VBox();	
+	//main game board
+	GridPane gameBoard = new GridPane();
+	
+	/**
+     * Construct an object instance of the TetrisBoard class.
+     */
+		public TetrisBoard() {
+			gameBoard.setGridLinesVisible(true);
+			board = new TetrisBox[row][col];//polymorphism
+			//add box to the gameBoard
+			for(int i = 0; i <row; i++) {
+				for(int j= 0 ; j <col; j++) {
+					TetrisBox box = new TetrisBox();
+					board[i][j] = box;
+					box.paint();
+					gameBoard.add(box,j,i);//add square to gameBoard one by one
+				}//for
+			}//for
+		
+			
+		//set the gameboard to the middle of the pane	
+		setCenter(gameBoard);
+		//call to make a newshape object before star
+		newShape();
+		//start dropping down the shapes
+		downTimer();
+ 		}//TetrisBoard Constructor
+		
+		/**
+		 *This method start a timeline for dropping down the shape every half
+		 *second and the CycleCount is INDEFINITE
+		 */
+		public void downTimer() {
+			KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.3), downHandler);
+			timeline.setCycleCount(Timeline.INDEFINITE);
+			timeline.getKeyFrames().add(keyFrame);
+			timeline.play();
+		}
+		
+		//handler for dropping down shapes
+				EventHandler<ActionEvent> downHandler = event -> {
+					//check if there is space to go down
+					for(int i = row-1; i >= 0 ; i--) {
+						for(int j = 0; j < col; j++) {
+							if(board[i][j].liveBox == true) {
+								if(i+1>17 || board[i+1][j].hasBox==true ) {
+									hasSpace=false;
+								}//if
+							}//if
+						}//for
+					}//for
+			
+					
+					//if no space to move down, set square equal to -1 
+					if(hasSpace==false) {
+						for(int i = 17; i >= 0 ; i--) {
+							for(int j = 0; j < 10; j++) {
+								if(board[i][j].liveBox==true) {
+									board[i][j].liveBox=false;
+									board[i][j].hasBox=true;
+								};
+							}//for
+						}//for
+						System.out.println("no space");
+						cleanRow();
+						newShape();//if shape got stuck, call new shape
+						//if
+					}//if
+					
+					//go down
+					if(hasSpace) {
+						for(int i = 17; i >= 0 ; i--) {
+							for(int j = 0; j < 10; j++) {
+								if(board[i][j].liveBox==true) {
+									board[i][j].liveBox=false;
+									board[i+1][j].liveBox=true;
+									board[i][j].shapeNum=0;
+									board[i+1][j].shapeNum=shape;
+									board[i][j].paint();
+									board[i+1][j].paint();
+									
+								}//if
+							}//for
+						}//for
+					}//if
+					hasSpace=true;
+				};//downHandler
+				
+				//clean row
+				public void cleanRow() {
+					boolean clear = false;
+					int row = 0 ;
+					for(int i = this.row-1; i >=0; i--) {
+						System.out.println("first loop");
+						boolean hasIt = true;
+						for(int j = 0; j<this.col; j++) {
+							System.out.println("first loop");
+							if(board[i][j].hasBox==false) {
+								System.out.println("first loop");
+								hasIt = false;
+								break;
+							}//if
+						}//for
+						if(hasIt==true) {
+						clear=true;
+						row = i;
+						System.out.println(row);
+						break;
+						}//if
+					}//for
+					
+				
+					if (clear==true) {
+						System.out.println("almost");
+						for(int i = row; i>0; i --) {
+							System.out.println("SUCCESS");
+							board[i]=board[i-1];
+						}//for
+						for(int i = 0;i<col;i++) {
+							board[row][i].paint();
+						}//paint the new row
+						board[0]= board[1];
+						for(int i = 0;i<col;i++) {
+							board[0][i].paint();
+						}//paint the new first row
+						score=score+10;
+						cleanRow();
+					}//if
+					if(clear==false) {
+						return;
+					}//if
+				}//cleanRow
+	
+	//draw new shape
+		public void newShape() {	
+			Random r = new Random();
+			int shape = r.nextInt(7) + 1;
+			shape=4;
+			this.shape = shape;
+			
+			//create the shape that correspond to the random number
+			switch(shape) {
+			case 1:
+				//check for lose
+				if(keepGoing) {
+					for(int i = 3; i < 7; i++) {
+						if(board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				//draw hape
+				if(keepGoing) {
+					for(int i = 3; i < 7; i++) {
+						board[0][i].liveBox=true;//set true
+						board[0][i].shapeNum=1;//set color code
+						board[0][i].paint();//show
+					}//for
+				}//if
+				break;
+			case 2:
+					//check for game over
+				if(keepGoing) {
+					for(int i = 3; i < 6; i++) {
+						if(board[1][5].hasBox==true||board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				//draw shape
+				if(keepGoing) {
+					board[1][5].liveBox=true;//set true
+					board[1][5].shapeNum=2;//set color code
+					board[1][5].paint();//show
+					for(int i = 3; i < 6; i++) {
+						board[0][i].liveBox=true;//set true
+						board[0][i].shapeNum=2;//set color code
+						board[0][i].paint();//show
+					}//for
+				}//if
+					break;
+			case 3:
+				//check for game over
+				if(keepGoing) {
+					for(int i = 3; i < 6; i++) {
+						if(board[1][3].hasBox==true||board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				//drawn shape
+				if(keepGoing) {
+					for(int i = 3; i < 6; i++) {
+						board[0][i].liveBox=true;//set true
+						board[0][i].shapeNum=3;//set color code
+						board[0][i].paint();//show
+					}//for
+					board[1][3].liveBox=true;
+					board[1][3].shapeNum=3;
+					board[1][3].paint();//show
+				}//if
+				break;
+			case 4:
+				//check for game over
+				if(keepGoing) {
+					for(int i = 0; i < 2; i++) {
+						for(int j=4; j<6; j++) {
+							if(board[i][j].hasBox==true) {
+								keepGoing = false;
+								lose();
+								break;
+							}//if
+						}//for
+						if(keepGoing==false) break;//if
+					}//for
+				}//if
+				if(keepGoing) {
+					for(int i =0; i <2; i++) {
+						for(int j=4; j<6; j++) {
+							board[i][j].liveBox=true;
+							board[i][j].shapeNum=4;
+							board[i][j].paint();//show
+						}//for
+					}//for
+				}//if
+				break;
+			case 5:
+				//check for game over
+				if(keepGoing) {
+					//check for game over
+					for(int i = 4; i < 6; i++) {
+						if(board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				
+				if(keepGoing) {
+					for(int i = 3; i < 5; i++) {
+						if(board[1][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				
+				if(keepGoing) {
+					for(int i=4; i<6; i++) {
+						board[0][i].liveBox=true;
+						board[0][i].shapeNum=5;
+						board[0][i].paint();//show
+					}//for
+					for(int i=3; i<5; i++) {
+						board[1][i].liveBox=true;
+						board[1][i].shapeNum=5;
+						board[1][i].paint();//show
+					}//for
+				}//if
+					break;
+			case 6:
+				//check for game over
+				if(keepGoing) {
+					for(int i = 3; i < 6; i++) {
+						if(board[1][4].hasBox==true||board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				//draw shape
+				if(keepGoing) {
+					board[1][4].liveBox=true;//set true
+					board[1][4].shapeNum=6;//set color code
+					board[1][4].paint();//show
+					for(int i = 3; i < 6; i++) {
+						board[0][i].liveBox=true;//set true
+						board[0][i].shapeNum=6;//set color code
+						board[0][i].paint();//show
+					}//for
+				}//if
+				break;
+			case 7:
+				//check for game over
+				if(keepGoing) {
+					//check for game over
+					for(int i = 4; i < 6; i++) {
+						if(board[1][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				
+				if(keepGoing) {
+					for(int i = 3; i < 5; i++) {
+						if(board[0][i].hasBox==true) {
+							keepGoing = false;
+							lose();
+							break;
+						}//if
+					}//for
+				}//if
+				
+				if(keepGoing) {
+					for(int i=4; i<6; i++) {
+						board[1][i].liveBox=true;
+						board[1][i].shapeNum=7;
+						board[1][i].paint();//show
+					}//for
+					for(int i=3; i<5; i++) {
+						board[0][i].liveBox=true;
+						board[0][i].shapeNum=7;
+						board[0][i].paint();//show
+					}//for
+				}//if
+				break;
+			}//switch
+		}//newShape
+	
+	
+	
+	private void lose() {
+		timeline.pause();
+			System.out.println("You lose");
+			
+		}//lose
+
+
+
+	//Box Class represent individual square
+	public class TetrisBox extends Rectangle{
+		public int shapeNum = 0;//shape corresponding number
+		public boolean liveBox = false;//whether the box is movable
+		public boolean hasBox = false;
+		
+		TetrisBox(){
+			super(45,45);//set dimension
+			
+			setStroke(Color.BLACK);
+		}//Constructor
+		
+		public void paint() {
+			
+			switch(shapeNum) {
+			case 0:
+				setFill(Color.LAVENDER);
+				break;
+			case 1:
+				setFill(Color.CYAN);
+				break;
+			case 2:
+				setFill(Color.BLUE);
+				break;
+			case 3:
+				setFill(Color.ORANGE);
+				break;
+			case 4:
+				setFill(Color.YELLOW);
+				break;
+			case 5:
+				setFill(Color.GREEN);
+				break;
+			case 6:
+				setFill(Color.PURPLE);
+				break;
+			case 7:
+				setFill(Color.RED);
+				break;
+			}//switch
+		}//paint
+	}//TetrisBox
+
+
+}//TetrisBoard

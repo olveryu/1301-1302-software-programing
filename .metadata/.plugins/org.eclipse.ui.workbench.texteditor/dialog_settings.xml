@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="Image" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="Image"/>
+			<item value="File"/>
+			<item value="file"/>
+			<item value="System.o"/>
+			<item value="system."/>
+			<item value="currentTimeMillis"/>
+			<item value="pow"/>
+			<item value="myScanner"/>
+			<item value="reverse"/>
+			<item value="currennt"/>
+			<item value="ceil"/>
+			<item value="longititude"/>
+			<item value="principle"/>
+		</list>
+		<list key="replacehistory">
+			<item value="nanoTime"/>
+			<item value="NanoTime"/>
+			<item value="reversePrint"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="336" key="DIALOG_WIDTH"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+		<item value="529" key="DIALOG_HEIGHT"/>
+		<item value="9" key="DIALOG_X_ORIGIN"/>
+		<item value="98" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>

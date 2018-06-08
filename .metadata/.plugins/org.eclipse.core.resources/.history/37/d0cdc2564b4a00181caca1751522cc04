@@ -1,0 +1,143 @@
+import javafx.animation.KeyFrame;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+public class TetrisApp extends Application {
+
+    @Override
+    public void start(Stage stage) {
+    	//set restart button on action
+    	TetrisBoard newGame = new TetrisBoard();
+    	
+        Scene scene = new Scene(newGame);
+        scene.setOnKeyPressed(e->{
+        	//left arrow pressed
+        	if(e.getCode()==KeyCode.LEFT) {
+        		Boolean hasSpace=true;
+        		//check for space
+        		for(int i = newGame.row-1; i >= 0 ; i--) {
+        			for(int j = 0; j < newGame.col; j++) {
+        				if(newGame.board[i][j].liveBox == true) {
+        					if(j-1 < 0 || newGame.board[i][j-1].hasBox==true ) {
+        						hasSpace=false;
+    						}//if
+    					}//if
+    				}//for
+    			};//for
+    			//if there is space move left
+    			if(hasSpace) {
+    				newGame.centerCol--;
+    				for(int i = newGame.row-1; i >= 0 ; i--) {
+    					for(int j = 0; j < newGame.col; j++) {
+    						if(newGame.board[i][j].liveBox==true) {
+    							newGame.board[i][j].liveBox=false;
+    							newGame.board[i][j].shapeNum=0;
+    							newGame.board[i][j].paint();
+    							newGame.board[i][j-1].liveBox=true;
+    							newGame.board[i][j-1].shapeNum=newGame.shape;
+    							newGame.board[i][j-1].paint();
+    						}
+    					}//for
+    				}//for
+    			}//if
+    			hasSpace=true;
+        	}//if
+        	
+        	//right arrow pressed
+        	if(e.getCode()==KeyCode.RIGHT) {
+        		Boolean hasSpace=true;
+        		//check for space
+        		for(int i = newGame.row-1; i >= 0 ; i--) {
+        			for(int j = 0; j < newGame.col; j++) {
+        				if(newGame.board[i][j].liveBox == true) {
+        					if(j+1 >9  || newGame.board[i][j+1].hasBox==true ) {
+        						hasSpace=false;
+    						}//if
+    					}//if
+    				}//for
+    			};//for
+    			//if there is space move right
+    			System.out.println(hasSpace);
+    			if(hasSpace) {
+    				newGame.centerCol++;
+    				for(int i = newGame.row-1; i >= 0 ; i--) {
+    					for(int j = newGame.col-1; j >= 0; j--) {
+    						if(newGame.board[i][j].liveBox==true) {
+    							newGame.board[i][j].liveBox=false;
+    							newGame.board[i][j].shapeNum=0;
+    							newGame.board[i][j].paint();
+    							newGame.board[i][j+1].liveBox=true;
+    							newGame.board[i][j+1].shapeNum=newGame.shape;
+    							newGame.board[i][j+1].paint();
+    						}//if
+    					}//for
+    				}//for
+    				
+    			}//if
+    			hasSpace=true;
+        	}//if        		
+        	//change shape
+//        	while(newGame.gameInPlay) {
+//        		if(e.getCode()==KeyCode.UP) {
+//        			switch(newGame.shape) {
+//        			case 7:
+////        				for(int i = newGame.row-1; i >= 0 ; i--) {
+////        					for(int j = newGame.col-1; j >= 0; j--) {
+////        						if(newGame.board[i][j].liveBox==true) {
+////        							//reset orginal squares
+////        							newGame.board[i][j].liveBox=false;
+////        							newGame.board[i][j].shapeNum=0;
+////        							newGame.board[i][j].paint();
+////        						}//if
+////        					}//for
+////        				}//for
+//        				//first
+//        				newGame.board[newGame.centerRow-1][newGame.centerCol].liveBox=true;
+//        				newGame.board[newGame.centerRow-1][newGame.centerCol].shapeNum=newGame.score;
+//        				newGame.board[newGame.centerRow-1][newGame.centerCol].paint();
+//        				//first
+//        				newGame.board[newGame.centerRow][newGame.centerCol-1].liveBox=true;
+//        				newGame.board[newGame.centerRow][newGame.centerCol-1].shapeNum=newGame.score;
+//        				newGame.board[newGame.centerRow][newGame.centerCol-1].paint();
+//        				//first
+//        				newGame.board[newGame.centerRow][newGame.centerCol].liveBox=true;
+//        				newGame.board[newGame.centerRow][newGame.centerCol].shapeNum=newGame.score;
+//        				newGame.board[newGame.centerRow][newGame.centerCol].paint();
+//        				//first
+//        				newGame.board[newGame.centerRow+1][newGame.centerCol-1].liveBox=true;
+//        				newGame.board[newGame.centerRow+1][newGame.centerCol-1].shapeNum=newGame.score;
+//        				newGame.board[newGame.centerRow+1][newGame.centerCol-1].paint();
+//        			break;
+//        		}//switch
+//        	}//if
+//        	}//while
+	    });//setOnKeyPressed
+        
+        stage.setTitle("cs1302-arcade!");
+        stage.setScene(scene);
+        stage.sizeToScene();
+        stage.setHeight(810);
+        stage.setMinHeight(810);
+		stage.setWidth(450);
+		stage.setMinWidth(450);
+        stage.show();
+
+
+    } // start
+
+    public static void main(String[] args) {
+	try {
+	    Application.launch(args);
+	} catch (UnsupportedOperationException e) {
+	    System.out.println(e);
+	    System.err.println("If this is a DISPLAY problem, then your X server connection");
+	    System.err.println("has likely timed out. This can generally be fixed by logging");
+	    System.err.println("out and logging back in.");
+	    System.exit(1);
+	} // try
+    } // main
+
+} // ArcadeApp

@@ -1,0 +1,67 @@
+Database "professors" created.
+(CREATE DATABASE professors)
+
+Database "grades" created.
+(CREATE DATABASE grades)
+
+Database "professor" created.
+(CREATE DATABASE professor)
+
+Database "professors" dropped and all files deleted.
+(DROP DATABASE professors)
+
+Table "names.txt" created.
+(CREATE TABLE professor.names)
+
+Table "students.txt" created.
+(CREATE TABLE professor.students)
+
+Table "colleges.txt" created.
+(CREATE TABLE professor.colleges)
+
+Table "students.txt" deleted.
+(DROP TABLE professor.students)
+
+inserted ""Jackson Browne"".
+(INSERT "Jackson Browne" INTO professor.names)
+
+inserted ""Beyonce"".
+(INSERT "Beyonce" INTO professor.names)
+
+inserted ""Dean Cain"".
+(INSERT "Dean Cain" INTO professor.names)
+
+inserted ""Snoop Dog"".
+(INSERT "Snoop Dog" INTO professor.names)
+
+inserted ""University of Georgia"".
+(INSERT "University of Georgia" INTO professor.colleges)
+
+inserted ""Georgia Tech"".
+(INSERT "Georgia Tech" INTO professor.colleges)
+
+inserted ""Kennesaw State University"".
+(INSERT "Kennesaw State University" INTO professor.colleges)
+
+inserted ""Georgia Southern"".
+(INSERT "Georgia Southern" INTO professor.colleges)
+
+
+"names.txt" reading completed.
+(SELECT * FROM professor.names WHERE COLUMN = "Jackson Browne")
+
+""Jackson Browne"" has been deleted.
+(DELETE FROM professor.names WHERE COLUMN = "Jackson Browne")
+
+""Beyonce"" has been update to ""The Martian"".
+(UPDATE professor.names SET COLUMN = "The Martian" WHERE COLUMN = "Beyonce")
+
+selectAll for "names.txt" reading completed.
+(SELECT * FROM professor.names)
+
+selectAll for "colleges.txt" reading completed.
+(SELECT * FROM professor.colleges)
+
+"colleges.txt" all records deleted. 
+(DELETE FROM professor.colleges)
+
